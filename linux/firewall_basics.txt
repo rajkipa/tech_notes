@@ -1,0 +1,252 @@
+##Link https://www.certdepot.net/rhel7-get-started-firewalld/
+
+To get the default zone, type:
+
+# firewall-cmd --get-default-zone
+public
+To get the list of zones where you’ve got network interfaces or sources assigned to, type:
+
+# firewall-cmd --get-active-zones
+public
+interfaces: eth0
+To get the list of all the available zones, type:
+
+# firewall-cmd --get-zones
+block dmz drop external home internal public trusted work
+To change the default zone to home permanently, type:
+
+# firewall-cmd --set-default-zone=home
+success
+
+Note: This information is stored in the /etc/firewalld/firewalld.conf file.
+
+Network interfaces can be assigned to a zone in a permanent way.
+To permanently assign the eth0 network interface to the internal zone (a file called internal.xml is created in the /etc/firewalld/zones directory), type:
+
+# firewall-cmd --permanent --zone=internal --change-interface=eth0
+success
+
+Note1: This operation can also be done by editing the /etc/sysconfig/network-scripts/ifcfg-eth0 file and add ZONE=internal followed by # nmcli con reload
+Note2: More information about the nmcli command is available at the page dedicated to nmcli or at the IPV4 configuration page.
+
+To know which zone is associated with the eth0 interface, type:
+
+# firewall-cmd --get-zone-of-interface=eth0
+internal
+
+To get the permanent configuration of the public zone, type:
+
+# firewall-cmd --permanent --zone=public --list-all
+public (default, active)
+  interfaces: eth0
+  sources: 
+  services: dhcpv6-client ssh
+  ports: 
+  masquerade: no
+  forward-ports: 
+  icmp-blocks: 
+  rich rules: 
+
+
+ It is also possible to create new zones. To create a new zone (here test), type:
+
+# firewall-cmd --permanent --new-zone=test
+success
+# firewall-cmd --reload
+success
+
+Note: Only permanent zones can be created.
+
+Source Management
+
+A zone can be bound to a network interface (see above) and/or to a network addressing (called here a source).
+Any network packet entering in the network stack is associated with a zone.
+The association is done according to the following pattern:
+– is the packet coming from a source already bound to a zone? (if yes, it is associated with this zone),
+– if not, is the packet coming from a network interface already bound to a zone? (if yes, it is associated with this zone),
+– if not, the packet is associated with the default zone.
+
+This way, multiple zones can be defined even on a server with only one network interface!
+
+Caution: To get this feature, Firewalld relies on NetworkManager (see reference). This means that if you plan to stop NetworkManager for any reason (for example when building a KVM host), you will have to stop Firewalld and use Iptables instead!
+
+To add a source (here 192.168.2.0/24) to a zone (here trusted) permanently, type:
+
+# firewall-cmd --permanent --zone=trusted --add-source=192.168.2.0/24
+success
+# firewall-cmd --reload
+success
+Note1: Use the –remove-source option to delete a previous assigned source.
+Note2: Use the –change-source option to move the source to the new specified zone.
+Note3: If you want to temporarily add a source to a zone, don’t use the –permanent option and don’t reload the firewall configuration. If you reload the firewall configuration, this will cancel all the operation.
+Note4: You can also make some changes and when you like your new configuration, have it become your permanent configuration with the firewall-cmd –runtime-to-permanent command.
+
+To get the list of the sources currently bound to a zone (here trusted), type:
+
+# firewall-cmd --zone=trusted --list-sources
+192.168.2.0/24
+Note: Add the –permanent option if you only want to display permanent settings.
+
+To keep track of your configuration (active zones are zones that have a binding to an interface or source), type:
+
+# firewall-cmd --get-active-zones
+public
+  interfaces: eth0
+trusted
+  sources: 192.168.2.0/24
+As an exemple of source management, let’s assume you want to only allow connections to your server from a specific IP address (here 1.2.3.4/32).
+
+# firewall-cmd --zone=internal --add-service=ssh --permanent
+success
+# firewall-cmd --zone=internal --add-source=1.2.3.4/32 --permanent
+success
+# firewall-cmd --zone=public --remove-service=ssh --permanent
+success
+# firewall-cmd --reload
+success
+Source: Serverfault website.
+
+Service Management
+
+After assigning each network interface to a zone, it is now possible to add services to each zone.
+To allow the http service permanently in the internal zone, type:
+
+# firewall-cmd --permanent --zone=internal --add-service=http
+success
+# firewall-cmd --reload
+success
+Note1: Type –remove-service=http to deny the http service.
+Note2: The firewall-cmd –reload command is necessary to activate the change. Contrary to the –complete-reload option, current connections are not stopped.
+Note3: If you only want to temporarily add a service, don’t use the –permanent option and don’t reload the firewall configuration. If you reload the firewall configuration, you cancel all the operation.
+
+If you want to temporary add several services (here http, https, and dns) at the same time in the internal zone, type:
+
+# firewall-cmd --zone=internal --add-service={http,https,dns}
+success
+To get the list of services in the default zone, type:
+
+# firewall-cmd --list-services
+dhcpv6-client ssh
+Note: To get the list of the services in a particular zone, add the –zone= option.
+
+Service Firewall Configuration
+
+With the Firewalld package, the firewall configuration of the main services (ftp, httpd, etc) comes in the /usr/lib/firewalld/services directory. But it is still possible to add new ones in the /etc/firewalld/services directory. Also, if files exist at both locations for the same service, the file in the /etc/firewalld/services directory takes precedence.
+
+For example, it is the case of the HAProxy service. There is no firewall configuration associated.
+Create the /etc/firewalld/services/haproxy.xml and paste the following lines:
+
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+ <short>HAProxy</short>
+ <description>HAProxy load-balancer</description>
+ <port protocol="tcp" port="80"/>
+</service>
+Note: You can use the firewall-cmd –permanent –new-service=haproxy command to quickly create a configuration file skeleton.
+
+Assign the correct SELinux context and file permissions to the haproxy.xml file:
+
+# cd /etc/firewalld/services
+# restorecon haproxy.xml
+# chmod 640 haproxy.xml
+Add the HAProxy service to the default zone permanently and reload the firewall configuration:
+
+# firewall-cmd --permanent --add-service=haproxy
+success
+# firewall-cmd --reload
+success
+Port Management
+
+Port management follows the same model as service management.
+
+To allow the 443/tcp port temporarily in the internal zone, type:
+
+# firewall-cmd --zone=internal --add-port=443/tcp
+success
+Note1: To make the configuration permanent, add the –permanent option and reload the firewall configuration.
+Note2: Type –remove-port=443/tcp to deny the port.
+
+To get the list of ports currently open in the internal zone, type:
+
+# firewall-cmd --zone=internal --list-ports
+443/tcp
+Note: To only get the list of ports permanently open, add the –permanent option. Here, you will not get anything.
+
+Masquerading
+
+If your firewall is your network gateway and you don’t want everybody to know your internal addresses, you can set up two zones, one called internal, the other external, and configure masquerading on the external zone. This way, all packets will get your firewall ip address as source address.
+
+To set up masquerading on the external zone in a temporary way, type:
+
+# firewall-cmd --zone=external --add-masquerade
+success
+Note1: To remove masquerading, use the –remove-masquerade option.
+Note2: To know if masquerading is active in a zone, use the –query-masquerade option.
+Note3: To get the configuration permanent, add the –permanent option and reload the firewall configuration.
+
+Port Forwarding
+
+In addition to the masquerading, you can want to use port forwarding.
+If you want all packets intended for port 22 to be now forwarded to port tcp 3753 temporarily, type:
+
+# firewall-cmd --zone=external --add-forward-port=port=22:proto=tcp:toport=3753
+success
+Note1: To remove port forwarding, use the –remove-forward-port option.
+Note2: To know if port forwarding is active in a zone, use the –query-forward-port option.
+Note3: If you want to make the configuration permanent, add the –permanent option and reload the firewall configuration.
+
+Also, if you want to define the destination ip address, this time in a permanent way, type:
+
+# firewall-cmd --permanent --zone=external --add-forward-port=port=22:proto=tcp:toport=3753:toaddr=10.0.0.1
+success
+# firewall-cmd --reload
+success
+Direct Rules
+
+It is still possible to set specific rules by using the direct mode (here to open the tcp port 9000) that by-passes the Firewalld interface:
+
+# firewall-cmd --direct --add-rule ipv4 filter INPUT 0 -p tcp --dport 9000 -j ACCEPT
+success
+Note1: This example has been borrowed from Khosro Taraghi’s blog.
+Note2: Use the same command with the –remove-rule instead of –add-rule to delete the rule.
+Note3: The configuration is temporary except if you add the –permanent option just after the –direct option.
+Note4: It is not necessary to reload the firewall configuration, all commands are directly activated.
+
+To display all the direct rules added, type:
+
+# firewall-cmd --direct --get-all-rules
+Note: For information, the configuration is written into the /etc/firewalld/direct.xml file.
+
+Special Modules
+
+Sometimes it is required to download specific modules. Instead of using a rc.local file, it is better to notify Firewalld through the /etc/modules-load.d directory.
+In this example we want to add the ip_nat_ftp and ip_conntrack_ftp modules to follow ftp connections.
+We only need to choose a filename (here firewall_ftp.conf) and type these instructions:
+
+# echo ip_nat_ftp > /etc/modules-load.d/firewall_ftp.conf
+# echo ip_conntrack_ftp >> /etc/modules-load.d/firewall_ftp.conf
+Source: StackExchange website.
+
+Offline Configuration
+
+In some cases (installations through Anaconda or Kickstart for example), you need to set up firewall rules when Firewalld is not running. The firewall-offline-cmd command has just been created for this purpose.
+For instance, to open the tcp port 22, you would type in the /etc/sysconfig/iptables file:
+
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+Instead, you can now execute the following command:
+
+# firewall-offline-cmd --direct --add-rule ipv4 filter INPUT 0 -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+Configuration Backup
+
+To store the current configuration into files, type:
+
+# iptables -S > firewalld_rules_ipv4
+# ip6tables -S > firewalld_rules_ipv6
+Debugging Tip
+
+To better understand how Firewalld works, assign the ‘–debug’ value to the FIREWALLD_ARGS variable in the /etc/sysconfig/firewalld file:
+
+# firewalld command line args
+# possile values: --debug
+FIREWALLD_ARGS='--debug'
+Note: Messages will be written into the /var/log/firewalld file.

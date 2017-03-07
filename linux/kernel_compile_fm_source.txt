@@ -1,0 +1,6 @@
+1. Install the following packages
+	bc, gcc, make, makeconfig, ncurse, ncurses-devel, kernel-devel, openssl-devel, rpm, rpm-build
+
+2. Download the source code from linux archive
+3. make menuconfig
+4. make rpm

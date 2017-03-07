@@ -1,0 +1,15 @@
+Recursive query: When the client request the dns server and expect the ans to be yes or no. It doesn't expect the dns server to come up with the answer to go and check with someone else.
+
+Iterative query: To repeat things over n over, check the dns result from someone if it doesn't have it will return with forwarding server name, then go and check with the forwarding server until the answer is found.
+ 
+ DNS query can have 4 types of ans.
+ 1. Authoritative: If it can reply based on the zone hosted locally on the dns server.
+ 2. Positive:  It is not authoritative, where DNS server has to perform certain referrals before answering a query. The part where it ans back to client is called as positive.
+ 3. Referal: Where our DNS server will ask questions to forwarders. 
+ 4. Negative: No answer retured
+
+
+ realtime example
+ login to www.cbtnuggets.com
+ 1. src mac is destined for local server.
+ 2. local to 

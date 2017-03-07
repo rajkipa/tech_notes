@@ -1,0 +1,9 @@
+1. nfs client doesn't mount on boot in centos7.
+Resolution:
+	a. systemctl list-dependencies <mount_point>.mount
+	b. systemctl list-dependencies --after <mount_point>.mount
+	c. network.target makes sure that the network services are started it doesn't necessary means that they are completely up.
+	d. network-online.target makes sure that the network services are up and running.
+	e. add Requires=network.service nfs-client.target basic.target in network-online.target and it's all done.
+
+2.
