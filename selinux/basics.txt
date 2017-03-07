@@ -1,0 +1,71 @@
+Golden Principle of security
+1. Know your system
+2. Principle of least privilege ===> SELinux
+3. Defence in depth
+4. Protection is key but detection is must
+5. Know your enemy
+
+DAC = Discretionary Access Control (rwx, chmod, setfacl)
+MAC = Mandatory Access Control (SELinux, RBAC)
+
+SELinux = Security Enhanced Linux
+	It is a Mandatory Access Control
+	It is implemented through kernel modules called security modules and user space tools
+	Redhat Implement the targeted policy of selinux which restricts are targeted process 
+	example of targeted policies are TCP/UDP, files/directories, memory locations and others
+
+SELinux has 4 forms of access control:
+1. Targeted Enforcement (TE) 
+2. Strict
+3. Role based Access Control (RBAC)
+4. Multi-level security (MLS)
+
+Modes in SELinux
+1. Enabled = SELinux policy is checked and active
+2. Permissive = SELinux policy is checked and not enforcing. 
+3. Disabled = SELinux doesn't play any role
+
+SELinux can be defined in one word as labeling
+
+Subjects = Process
+Objects  = File, TCP/UDP, sockets, FIFO
+Every subjects and objects have one security context attached to it.
+If it is associated to process it's called domain
+If it's associated to file is called file context
+
+
+example of selinux context
+user:role:type:level
+
+context hell
+1. If you move a file, the context of original file maintains
+2. If you copy a file where it exists in destination it maintains the context of destination file and if it doesn't exist it gets the context based on the directory above it.
+
+
+Core Programs to manipulate selinux is
+chcon, setfiles, restorecon, sestatus
+
+
+To relabel the files for a system with disabled mode
+touch /.autorelabel
+reboot
+
+
+to do audit search
+ausearch -i -m AVC,USER_AVC -sv no
+
+
+To fix selinux
+1. wrong subject context
+2. wrong object context
+3. right subject and object context but no access
+4. Intrusion
+
+
+
+It is a type enforcing system.
+log file: /var/log/messages and /var/log/audit/audit.log
+the cache of selinux messages are called as Access Vector Cache (AVC)
+
+
+
