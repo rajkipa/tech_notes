@@ -1,0 +1,23 @@
+=> vagrant box
+	a. add => To add 
+	b. --box_version="1.6.5"
+	c. outdated --global => To check the outdated box version
+	d. update --box <version> => To update the box
+ 	e. --provider = aws,digitalocean,vmware,virtualbox
+
+
+=> vagrant port
+	a. It lists all mapped ports from guest to hosts
+	b. vagrant port my-machine
+	c. vagrant port --guest 22
+
+
+=> vagrant provision [vm-name]
+	
+
+=> vagrant snapshot
+	a. push = Shorthand of save, it saves the snapshot without name
+	b. pop = opposite of push
+	c. save = to save the snapshot with a name
+	d. restore = to rever the os back to old state
+	e. delete = to delete the snaphost

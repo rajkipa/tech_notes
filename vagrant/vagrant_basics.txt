@@ -1,0 +1,96 @@
+URL = https://www.vagrantup.com/docs/getting-started/providers.html
+vagrant boxes  https://atlas.hashicorp.com/boxes/search
+
+vagrant --version = 1.8.4
+vagrant-vbguest version = 0.12.0
+vbox = 5.0.24
+
+
+=> Setup Requirement
+		vagrant version = 1.8.4
+		virtual box = 5.0.24
+
+=> Install below vagrant plugins
+	vagrant plugin install vb-guest
+	vagrant plugin install vagrant-vbguest vagrant-share
+
+
+
+=> Vagrant works with provider and provisioner
+	Providers: 		virtualbox, vmware, aws, digitalocean
+	Provisioners:	puppet, chef
+
+=> vagrant box add "URL"=> This is to add a vagrant base image called as box
+		vagrant box add raj/centos
+=> vagrant init 				=> To initialize a working directory for vagrant and create Vagrantfile
+
+=> vagrant status				=> To check the status of vagrant instance
+
+=> vagrant up 					=> To bootstrap and start using a vagrant instance
+
+=> vagrant destroy			=> To destroy the vagrant instance
+
+=> vagrant suspend			=> To save current running state of machine and save it. Run vagrant up to resume the instance. It's superfast.  It requires more space to store VM RAM and disk on disk.
+
+=> vagrant halt					=> To gracefully shutdown guest OS and power down. To start the instance use vagrant up. It is slower
+
+=> vagrand destroy			=> To destroy the instance.
+
+=> vagrant reload				=> To restart the instance, skipping the initial import step
+
+=> vagrant reload --provision => To reload command instructs vagrant to run the provisioners.
+
+=> vagrant up --provider=vmware_fusion, or vagrant up --provider=aws
+
+
+
+=> To download vagrant boxes
+ 	https://atlas.hashicorp.com/boxes/search
+
+
+=> Modify Vagrantfile and update the line
+		Vagrant.configure("=") do |config|
+			config.vm.box = "raj/centos="			# To specify the vagrant box name to use for building the instance
+			config.vm.box_version = "=>1.0"		# To specify the version
+			config.vm.box_url = "http://URL"	# To specify the URL to download the vagrant base image from
+		end
+
+
+=> create bootstrap.sh with the following content
+	#!/usr/bin/env bash
+		apt-get update
+		apt-get install -y apache=
+		if ! [ -L /var/wwww ]; then
+			rm -rf /var/www
+			ln -fs /vagrant /var/www
+		fi
+
+
+=> Configure vagrant to run bootstrap.sh
+	Vagrant.configure("=") do |config|
+		config.vm.provision :shell, path: "bootstrap.shVagrant.configure("=") do |config|"
+	end 
+
+
+=> To make changes regarding to virtualbox
+  config.vm.provider "virtualbox" do |vb|
+    vb.gui = true				#	Display the VirtualBox GUI when booting the machine
+    vb.name = "centos=>1"# VM name in virtualbox
+    vb.memory = "=024"	# Customize the amount of memory on the VM:
+  end
+
+
+ => Networking/Port forwarding
+	Vagrant.configure("=") do |config|
+		config.vm.network :forwarded_port, guest: =0, host: 8008
+	end
+
+
+ => To configure .ssh public key inside vagrant vm
+   config.vm.provision "shell" do |s|
+    ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
+    s.inline = <<-SHELL
+      echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
+      echo #{ssh_pub_key} >> /root/.ssh/authorized_keys
+    SHELL
+  end
