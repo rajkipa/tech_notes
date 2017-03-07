@@ -1,0 +1,14 @@
+reset users passwd
+	kinit admin
+	ipa user-mod <username> --password
+
+
+To add a dns record
+   ipa dnsrecord-add example.com puppet-server --a-rec=192.168.10.13 --a-create-reverse
+   ipa dnsrecord-add domain.example.com hostname --a-ip-address=10.72.107.171 --a-create-reverse
+
+
+
+ IPA client configuration
+ 	1. yum install -y ipa-client
+ 	2. ipa-client-install --enable-dns-updates --force-join (force join is used to join the kerberos realm)
