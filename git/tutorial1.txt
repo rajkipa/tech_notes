@@ -1,0 +1,18 @@
+git config --system = For system wide config change 	(config file is in /etc/gitconfig)
+git config --global = Global to user 	(config file is in ~/.gitconfig)
+git config = For a specific project 	(config file is in my_project/.git/config)
+git config --list = To see all the config (cat ~/.gitconfig)
+git config user.name = To see a specific config (cat ~/.gitconfig)
+git config --global core.editor "vim"
+git config --global color.ui true
+
+
+
+git autocompletion feature
+--------------------------
+download the feature from github using curl and copy to home directory of user
+add the file to ~/.bash_profile
+	if [ -f ~/.git-completion.sh ]; then
+		source ~/.git-completion.sh
+	fi
+	

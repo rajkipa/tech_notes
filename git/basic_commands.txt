@@ -1,0 +1,85 @@
+1.  git status  = To check git status
+2.  git pull    = To update results from git server
+3.  git diff    = To check git diff between working directory and repository.
+                                diff SHA1..SHA2
+                                diff SHA1 filename
+                                diff SHA..HEAD^^
+                                diff --stat --summary SHA..HEAD
+                                diff -b (--ignore-space-change)
+                                diff -w (--ignore-all-space)
+                                diff --color-words <filename> ===> It shows the output in different format
+
+4.      git diff --staged = To compare the difference betwween staging index and repo
+4.  git branch -v = To check the list of branches and the current branch we are in
+5.  git checkout -b raj = To create a branch raj and checkout to raj
+6.  git add .gitignore = To add .gitignore to version control
+7.  git commit -m "comments" = To commit the changes
+8.  git config --global --edit = To change global config like email, name
+9.  git commit --amend -reset-author = To commit the changes
+10. git push origin master = To push the changes of branch to master
+11. git log = To change the git logs
+                                log --since="2 weeks ago" --until='3 days'
+                                log --author="raj"
+                                log --grep="temp"
+                                log --oneline
+                                log SHA1..SHA2
+                                log SHA1..SHA2 index.html (To check the log of index.html)
+                                log -p (It wll the diffs)
+                                log --stat --summary
+                                log --format=online
+                                log --format=short,medium,full,fuller,email,raw
+                                log --graph  --oneline -all --decorate
+
+12. git show SHA1
+
+
+
+To delete the file in git
+1. git rm file_to_delete.txt
+2. git commit -m 'commit the chnages'
+
+To rename a file in git
+1. rename the file in FS; git rm old_file ; git add new_file
+2. git mv old_file new_file  ==> A rename and modification will not show as two different entries, instead it will show as only rename.
+
+To restore from a git repo
+1. git checkout  = It brings down the named file from the git repository
+        a. git checkout -- <filename> = To bring down the named file from current branch of git repository
+        b. git checkout <branch> = To switch to different branch
+  c. git checkout SHArevisions -- <filename> = To restore filename from SHA revision
+                when git co from a particular revision it puts the file in staging index.
+
+2. To undo changes in staging area
+        a. git reset HEAD <filename> =  To unstage the filename from staging index
+
+3. only the last git commit can be modified with "git amend"
+        a. make the modification and then
+        b. git commit --amend -m 'Message'
+
+4. git revert <sharevision>
+        b. git revert -n = It won't commit the change instead it will stage the updates and waits for us to make the final commit
+
+5. git reset --soft
+                a. --soft = It will revert the head pointer to the older commit
+                b. --mixed = It will revert the head pointer and staging index
+                c. --hard = It will revert everything ie head pointer, staging index and working directory
+
+        ex. git reset --soft <SHA> It will reset the head to older version
+                To come back to latest version
+                        git reset --soft <Latest SHA>
+                        b. git reset --mixed <SHA>
+                        c. git reset --hard
+
+6. git clean = clean all the log and meta files which needs to be removed.
+                git clean -f = Will clean all files which is not in our repo or staging directory
+
+7. for ignoring user specific git files
+                git config --global core.excludesfile ~/.gitignore_global
+
+        User specific git file
+        ~/.gitconfig
+
+8. To tell git to stop tracking it.
+                git rm --cached <filename> It will remove the file fro staging index, and thus stop tracking this file.
+
+git by default ignores tracking empty directories.
