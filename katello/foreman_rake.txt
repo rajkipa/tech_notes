@@ -1,0 +1,17 @@
+https://access.redhat.com/solutions/1415993
+
+1. To clean orphan objects in katello db run the below command
+	a. foreman-rake katello:clear_backend_objects then run
+	b. foreman-rake katello:reindex
+
+Root cause- It happens due to inconsistency between katello and candlepin db
+
+To check the count of hosts in katello and candlepin run the below command
+1. su - postgres
+2. psql foreman
+3. selelct count(*) from katello_systems
+4. \q
+
+1. psql candlepin
+2. select count(*) from cp_consumer;
+3. \q

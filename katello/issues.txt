@@ -1,0 +1,13 @@
+Issue 1: client registration gets an error
+	There was an issue with the backend service pulp: Pulp message bus connection issue.
+
+Resolution:
+  1. Stop katello service 
+  		katello-service stop
+  2. Update mongodb schema
+  3. Start katello service
+  		katello-service start
+   OR
+	a. sudo -u apache /usr/bin/pulp-manage-db
+	b. systemctl restart pulp_resource_manager
+	
