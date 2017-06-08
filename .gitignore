@@ -1,3 +1,7 @@
 OS
 *.iso
 .DS_Store
+ansible
+LFS
+linux/issue.txt
+rough
