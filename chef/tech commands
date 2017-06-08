@@ -1,0 +1,5 @@
+xargs -a <filename> -n1 -I '{}' knife node show '{}'
+		{} = To pass the argument
+		-n1 = To convert the output delimited by space
+
+	cat test |xargs  -n1 -I '{}' bash -c " if ping -c1 '{}' > /dev/null 2>&1;  then echo '{}' pass;else echo '{}' 'fail';fi "

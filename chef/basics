@@ -1,0 +1,5 @@
+knife bootstrap <node name> -E <env> -r "role[centos7_base]" -x etstaff --sudo --use-sudo-password
+
+
+with specific cookbook version
+chef-client -o "recipe[mycookbook@0.1.1]"
