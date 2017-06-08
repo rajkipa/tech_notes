@@ -12,3 +12,9 @@ To add a dns record
  IPA client configuration
  	1. yum install -y ipa-client
  	2. ipa-client-install --enable-dns-updates --force-join (force join is used to join the kerberos realm)
+
+
+Add members to host-group
+	ipa hostgroup-add-member --hosts=box1,box2,box3 <hostgrouop>
+
+	ipa hostgroup-add-member --hostgroups=<hostgrp name> <server name>
