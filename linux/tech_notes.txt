@@ -7,3 +7,5 @@ Resolution:
 	e. add Requires=network.service nfs-client.target basic.target in network-online.target and it's all done.
 
 2.
+	a. read -s -p "password:" pass
+	b. knife ssh "name:*auth* AND chef_environment:<env> NOT name:*red*" 'echo ' $pass ' | sudo -S bash -c "service tomcat6 status ; service shibd status ; service httpd status"'
